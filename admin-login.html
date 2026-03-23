@@ -224,6 +224,8 @@ color:#6b7280;
 
 </div>
 
+<script src="frontend/src/services/api.js"></script>
+<script src="frontend/src/services/authService.js"></script>
 <script>
 
 /* ENTER KEY LOGIN */
@@ -248,24 +250,25 @@ spinner.style.display="block";
 btnText.innerText="Authenticating...";
 error.style.display="none";
 
-setTimeout(()=>{
+setTimeout(async()=>{
 
-const user=document.getElementById("username").value.trim();
+const email=document.getElementById("username").value.trim();
 const pass=document.getElementById("password").value.trim();
 
-/* TEMP LOGIN */
-if(user==="admin" && pass==="admin123"){
-
-localStorage.setItem("adminToken","demo-token");
-window.location.href="admin.html";
-
-}else{
-spinner.style.display="none";
-btnText.innerText="Login Securely";
-error.style.display="block";
+try{
+  const data = await AuthService.login({ email, password: pass });
+  if(data.user?.role !== "admin"){
+    throw new Error("Not an admin account");
+  }
+  AuthService.setSession(data);
+  window.location.href="admin.html";
+}catch(_e){
+  spinner.style.display="none";
+  btnText.innerText="Login Securely";
+  error.style.display="block";
 }
 
-},1200);
+},200);
 
 }
 

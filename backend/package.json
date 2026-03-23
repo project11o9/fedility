@@ -1,11 +1,12 @@
 {
-  "name": "backend",
+  "name": "fidelity-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "middleware:authMiddleware.js",
+  "description": "Fidelity trading demo backend",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node src/server.js",
+    "start:dev": "node src/server.js",
+    "lint": "node -e \"console.log('No lint configured')\""
   },
   "keywords": [],
   "author": "",
@@ -16,8 +17,6 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mysql2": "^3.18.0",
-    "pg": "^8.20.0",
-    "sqlite3": "^5.1.7"
+    "pg": "^8.20.0"
   }
 }

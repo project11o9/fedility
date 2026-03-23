@@ -163,11 +163,15 @@ color:#16a34a;
 <a href="wallet.html" class="nav-btn active">💰<span>Wallet</span></a>
 </div>
 
+<script src="frontend/src/services/api.js"></script>
+<script src="frontend/src/components/authGuard.js"></script>
 <script>
+const auth = AuthGuard.requireAuth();
+if(!auth){ throw new Error("Unauthorized"); }
 
-const API = "http://localhost:3001/api";
+const API = `${window.AppApi.getBaseUrl()}/api`;
 
-const token = localStorage.getItem("token");
+const token = auth.token;
 
 if(!token){
 location.href="login.html";

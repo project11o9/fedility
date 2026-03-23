@@ -273,26 +273,22 @@ Fill details to see calculation
 <div id="modalContent"></div>
 </div>
 </div>
+<script src="frontend/src/services/api.js"></script>
+<script src="frontend/src/components/authGuard.js"></script>
 <script>
+const auth = AuthGuard.requireAuth({ role: "admin" });
+if(!auth){ throw new Error("Unauthorized"); }
 
 /* =========================
    API BASE
 ========================= */
 
-const API="http://localhost:3001/api";
+const API=`${window.AppApi.getBaseUrl()}/api`;
 
 /* LOGIN */
 
 function login(){
-if(user.value==="admin" && pass.value==="admin123"){
-loginPage.style.display="none"
-adminPanel.style.display="block"
-renderUsers()
-loadDeposits()
-loadWithdraws()
-}else{
-alert("Invalid Login")
-}
+alert("Use admin-login page with JWT auth.")
 }
 
 function logout(){location.reload()}
@@ -312,7 +308,7 @@ async function renderUsers(){
 
 try{
 
-const res = await fetch(API + "/admin/users")
+const res = await fetch(API + "/admin/users",{headers:{Authorization:`Bearer ${auth.token}`}})
 
 if(!res.ok){
 console.error("Server error")
@@ -445,7 +441,8 @@ return
 const res = await fetch(API + "/admin/update-wallet",{
 method:"POST",
 headers:{
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+Authorization:`Bearer ${auth.token}`
 },
 body:JSON.stringify({
 userId:userId,
@@ -474,7 +471,8 @@ await fetch(API+"/admin/toggle-user",{
 method:"POST",
 
 headers:{
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+Authorization:`Bearer ${auth.token}`
 },
 
 body:JSON.stringify({
@@ -542,7 +540,7 @@ closeInject()
 
 async function loadDeposits(){
 
-const res = await fetch(API + "/admin/deposits");
+const res = await fetch(API + "/admin/deposits",{headers:{Authorization:`Bearer ${auth.token}`}});
 
 if(!res.ok){
 console.error("Failed to load deposits")
@@ -553,7 +551,7 @@ const data = await res.json();
 
 depositTable.innerHTML="";
 
-data.deposits.forEach(d=>{
+(data.deposits || []).forEach(d=>{
 
 depositTable.innerHTML+=`
 
@@ -585,7 +583,8 @@ async function approveDeposit(id,userId,amount){
 const res = await fetch(API + "/admin/approve-deposit",{
 method:"POST",
 headers:{
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+Authorization:`Bearer ${auth.token}`
 },
 body:JSON.stringify({
 requestId:id,
@@ -608,7 +607,7 @@ renderUsers()
 
 async function loadWithdraws(){
 
-const res = await fetch(API + "/admin/withdraws");
+const res = await fetch(API + "/admin/withdraws",{headers:{Authorization:`Bearer ${auth.token}`}});
 
 if(!res.ok){
 console.error("Failed to load withdraws")
@@ -619,7 +618,7 @@ const data = await res.json();
 
 withdrawTable.innerHTML="";
 
-data.withdraws.forEach(w=>{
+(data.withdraws || []).forEach(w=>{
 
 withdrawTable.innerHTML+=`
 
@@ -654,7 +653,8 @@ const res = await fetch(API+"/admin/approve-withdraw",{
 method:"POST",
 
 headers:{
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+Authorization:`Bearer ${auth.token}`
 },
 
 body:JSON.stringify({
@@ -664,6 +664,11 @@ amount:amount
 })
 
 });
+
+if(!res.ok){
+alert("Withdraw approval failed");
+return;
+}
 
 alert("Withdraw Approved");
 
